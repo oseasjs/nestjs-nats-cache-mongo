@@ -1,0 +1,8 @@
+.git
+.gitignore
+*.md
+.env
+test
+k8s
+node_modules
+*.log

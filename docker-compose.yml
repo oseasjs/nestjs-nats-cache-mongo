@@ -1,0 +1,52 @@
+version: '3.4'
+
+services:
+
+  mongo-db:
+    container_name: mongo-db
+    image: mongo
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: admin
+      # MONGO_INITDB_ROOT_PASSWORD: admin
+      DOCKER_HOST: host.docker.internal
+    ports:
+      - "27017:27017"
+    networks:
+      - nestjs-nats-cache-mongo-network
+
+  mongo-express-ui:
+    container_name: mongo-express-ui
+    image: mongo-express
+    ports:
+      - 18081:8081
+    environment:
+      # ME_CONFIG_BASICAUTH_USERNAME: admin
+      # ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_MONGODB_PORT: 27017
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongo-db
+      DOCKER_HOST: host.docker.internal
+    links:
+      - mongo-db
+    networks:
+      - nestjs-nats-cache-mongo-network
+    depends_on:
+      - mongo-db
+  
+  nats-1:
+    container_name: nats-1
+    command: '-js -name nats-ims-1 -m 8222'
+    image: nats
+    ports:
+      - '14221:4222'
+      - '16221:6222'
+      - '18221:8222'
+    environment:
+      DOCKER_HOST: host.docker.internal
+    networks:
+      - nestjs-nats-cache-mongo-network
+
+networks:
+  nestjs-nats-cache-mongo-network:
+    driver: bridge
